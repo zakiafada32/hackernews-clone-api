@@ -3,12 +3,16 @@ const jwt = require('jsonwebtoken');
 const { APP_SECRET, getUserId } = require('../utils');
 
 async function signup(parent, args, context, info) {
-  const password = await bcrypt.hash(args.password, 10);
-  const user = await context.prisma.user.create({
-    data: { ...args, password },
-  });
-  const token = jwt.sign({ userId: user.id }, APP_SECRET);
-  return { token, user };
+  try {
+    const password = await bcrypt.hash(args.password, 10);
+    const user = await context.prisma.user.create({
+      data: { ...args, password },
+    });
+    const token = jwt.sign({ userId: user.id }, APP_SECRET);
+    return { token, user };
+  } catch (error) {
+    console.log('error');
+  }
 }
 
 async function login(parent, args, context, info) {
@@ -31,6 +35,7 @@ async function login(parent, args, context, info) {
 
 async function post(parent, args, context, info) {
   const userId = getUserId(context);
+  // const userId = 1;
 
   const newLink = await context.prisma.link.create({
     data: {
